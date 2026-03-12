@@ -1,49 +1,154 @@
 "use client";
 
-import { useEffect, useRef, useState, useMemo } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Points, PointMaterial } from "@react-three/drei";
+import { useEffect, useRef, useState } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { fetchPexelsVideo } from "@/lib/pexels";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import * as THREE from 'three';
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-function ParticleSwarm(props: any) {
-  const ref = useRef<any>(null);
+const fragmentShader = `
+uniform float uTime;
+uniform vec2 uResolution;
 
-  const sphere = useMemo(() => {
-    const numPoints = 3000;
-    const positions = new Float32Array(numPoints * 3);
-    const radius = 1.5;
+// SDF functions
+float smin(float a, float b, float k) {
+  float h = clamp(0.5 + 0.5 * (b - a) / k, 0.0, 1.0);
+  return mix(b, a, h) - k * h * (1.0 - h);
+}
 
-    for (let i = 0; i < numPoints; i++) {
-      const theta = Math.random() * 2 * Math.PI;
-      const phi = Math.acos((Math.random() * 2) - 1);
-      const r = Math.cbrt(Math.random()) * radius;
+float sdSphere(vec3 p, float s) {
+  return length(p) - s;
+}
 
-      positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-      positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-      positions[i * 3 + 2] = r * Math.cos(phi);
-    }
-    return positions;
-  }, []);
+mat2 rot(float a) {
+  float s = sin(a), c = cos(a);
+  return mat2(c, -s, s, c);
+}
 
-  useFrame((state, delta) => {
-    if (ref.current) {
-      ref.current.rotation.x -= delta / 8;
-      ref.current.rotation.y -= delta / 12;
+float map(vec3 p) {
+  vec3 p1 = p;
+  vec3 p2 = p;
+  vec3 p3 = p;
+
+  p1.xy *= rot(uTime * 0.2);
+  p1.xz *= rot(uTime * 0.3);
+
+  p2.xy *= rot(-uTime * 0.1);
+  p2.xz *= rot(-uTime * 0.4);
+
+  p3.xy *= rot(uTime * 0.5);
+  p3.yz *= rot(-uTime * 0.2);
+
+  float d1 = sdSphere(p1 + vec3(sin(uTime)*0.5, cos(uTime*0.8)*0.5, 0.0), 0.8 + sin(uTime)*0.1);
+  float d2 = sdSphere(p2 + vec3(cos(uTime*1.2)*0.6, -sin(uTime*0.5)*0.6, 0.0), 0.6 + cos(uTime)*0.2);
+  float d3 = sdSphere(p3 + vec3(-sin(uTime*0.7)*0.4, -cos(uTime*0.9)*0.4, sin(uTime)*0.5), 0.7);
+
+  float d = smin(d1, d2, 0.5);
+  d = smin(d, d3, 0.5);
+
+  // Add displacement
+  d += sin(p.x * 5.0 + uTime) * sin(p.y * 5.0 + uTime) * sin(p.z * 5.0 + uTime) * 0.1;
+
+  return d;
+}
+
+vec3 calcNormal(vec3 p) {
+  const float h = 0.0001;
+  const vec2 k = vec2(1, -1);
+  return normalize(
+    k.xyy * map(p + k.xyy * h) +
+    k.yyx * map(p + k.yyx * h) +
+    k.yxy * map(p + k.yxy * h) +
+    k.xxx * map(p + k.xxx * h)
+  );
+}
+
+void main() {
+  vec2 uv = (gl_FragCoord.xy * 2.0 - uResolution.xy) / min(uResolution.x, uResolution.y);
+
+  vec3 ro = vec3(0.0, 0.0, 3.0);
+  vec3 rd = normalize(vec3(uv, -1.0));
+
+  float d0 = 0.0;
+  float d;
+  vec3 p;
+
+  for(int i = 0; i < 80; i++) {
+    p = ro + rd * d0;
+    d = map(p);
+    if(d < 0.001 || d0 > 10.0) break;
+    d0 += d;
+  }
+
+  vec3 col = vec3(0.0);
+
+  if(d0 < 10.0) {
+    vec3 n = calcNormal(p);
+
+    // Dark metallic lighting
+    vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+    vec3 lightDir2 = normalize(vec3(-1.0, -0.5, -0.5));
+
+    float diff1 = max(dot(n, lightDir), 0.0);
+    float diff2 = max(dot(n, lightDir2), 0.0);
+
+    // Specular
+    vec3 viewDir = normalize(ro - p);
+    vec3 reflectDir = reflect(-lightDir, n);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
+
+    // Red accent rim light
+    float rim = 1.0 - max(dot(viewDir, n), 0.0);
+    rim = smoothstep(0.6, 1.0, rim);
+
+    col = vec3(0.1) * diff1 + vec3(0.05) * diff2; // Base dark grey
+    col += vec3(1.0, 0.1, 0.1) * rim * 2.0; // Red rim
+    col += vec3(0.8) * spec; // Shiny highlights
+
+    // Fog
+    col = mix(col, vec3(0.0), 1.0 - exp(-0.1 * d0 * d0));
+  }
+
+  gl_FragColor = vec4(col, d0 < 10.0 ? 1.0 : 0.0);
+}
+`;
+
+const vertexShader = `
+void main() {
+  gl_Position = vec4(position, 1.0);
+}
+`;
+
+function SDFBackground() {
+  const materialRef = useRef<THREE.ShaderMaterial>(null);
+  const { size } = useThree();
+
+  useFrame((state) => {
+    if (materialRef.current) {
+      materialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
+      materialRef.current.uniforms.uResolution.value.set(size.width, size.height);
     }
   });
 
   return (
-    <group rotation={[0, 0, Math.PI / 4]}>
-      <Points ref={ref} positions={sphere} stride={3} frustumCulled={false} {...props}>
-        <PointMaterial transparent color="#dc2626" size={0.005} sizeAttenuation={true} depthWrite={false} opacity={0.8} />
-      </Points>
-    </group>
+    <mesh>
+      <planeGeometry args={[2, 2]} />
+      <shaderMaterial
+        ref={materialRef}
+        fragmentShader={fragmentShader}
+        vertexShader={vertexShader}
+        uniforms={{
+          uTime: { value: 0 },
+          uResolution: { value: new THREE.Vector2() }
+        }}
+        transparent={true}
+      />
+    </mesh>
   );
 }
 
@@ -140,13 +245,14 @@ export default function Hero() {
         </div>
       )}
 
-      <div className="absolute inset-0 z-10 pointer-events-none opacity-100">
-        <Canvas camera={{ position: [0, 0, 1] }}>
-          <ParticleSwarm />
+      {/* SDF Shader Canvas */}
+      <div className="absolute inset-0 z-10 pointer-events-none mix-blend-screen opacity-80">
+        <Canvas orthographic camera={{ position: [0, 0, 1], zoom: 1 }}>
+          <SDFBackground />
         </Canvas>
       </div>
 
-      <div className="relative z-20 flex flex-col items-center justify-center text-center px-4 w-full">
+      <div className="relative z-20 flex flex-col items-center justify-center text-center px-4 w-full pointer-events-none">
         <h1
           ref={titleRef}
           className="font-oswald text-[14vw] sm:text-[16vw] leading-[0.8] tracking-tighter text-white uppercase drop-shadow-[0_0_60px_rgba(220,38,38,0.5)] select-none mix-blend-exclusion overflow-hidden"

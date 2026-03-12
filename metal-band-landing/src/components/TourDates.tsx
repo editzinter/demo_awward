@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { fetchPexelsImage } from "@/lib/pexels";
+import Image from "next/image";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -125,7 +126,7 @@ export default function TourDates() {
           ref={cursorFollowerRef}
           className="fixed top-0 left-0 w-[400px] h-[250px] pointer-events-none z-0 scale-0 opacity-0 overflow-hidden mix-blend-screen"
         >
-          <img src={hoverImage} alt="Crowd" className="w-full h-full object-cover grayscale contrast-150" />
+          <Image src={hoverImage} alt="Crowd" fill className="w-full h-full object-cover grayscale contrast-150" />
           <div className="absolute inset-0 bg-red-900/40 mix-blend-multiply" />
         </div>
       )}
@@ -174,7 +175,7 @@ export default function TourDates() {
               <div className="col-span-2 mt-6 md:mt-0 flex md:justify-end">
                 <button className="relative overflow-hidden px-8 py-4 border border-zinc-700 text-white font-roboto-mono text-sm tracking-[0.2em] uppercase transition-all duration-300 group-hover:border-red-600 w-full md:w-auto text-center group/btn">
                   <span className="relative z-10 transition-transform duration-300 group-hover/btn:-translate-y-10 block">Tickets</span>
-                  <span className="absolute inset-0 flex items-center justify-center bg-red-600 z-10 translate-y-full transition-transform duration-300 group-hover/btn:translate-y-0 text-white font-bold block pt-4">Get 'Em</span>
+                  <span className="absolute inset-0 flex items-center justify-center bg-red-600 z-10 translate-y-full transition-transform duration-300 group-hover/btn:translate-y-0 text-white font-bold block pt-4">Get &apos;Em</span>
                 </button>
               </div>
             </div>

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { fetchPexelsImage } from "@/lib/pexels";
+import Image from "next/image";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -57,7 +58,7 @@ export default function Discography() {
       // Animate items as they come into view (even during horizontal scroll)
       const items = gsap.utils.toArray<HTMLElement>('.album-item');
 
-      items.forEach((item, i) => {
+      items.forEach((item) => {
         // Find the image inside the item
         const img = item.querySelector('img');
         const year = item.querySelector('.album-year');
@@ -139,9 +140,10 @@ export default function Discography() {
               {/* Album Art container */}
               <div className="w-full aspect-square relative overflow-hidden bg-zinc-900 shadow-2xl shadow-black/50 group-hover:shadow-red-900/20 transition-shadow duration-500 grayscale contrast-125 group-hover:grayscale-0">
                 {images[idx] ? (
-                  <img
+                  <Image
                     src={images[idx]}
                     alt={album.title}
+                    fill
                     className="w-full h-full object-cover mix-blend-screen"
                   />
                 ) : (

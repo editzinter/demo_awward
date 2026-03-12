@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { fetchPexelsImage } from "@/lib/pexels";
+import Image from "next/image";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -95,10 +96,11 @@ export default function About() {
       <div className="relative w-full md:w-5/12 h-[70vh] md:h-[90vh] overflow-hidden rounded-sm grayscale contrast-125 mb-16 md:mb-0 ml-0 md:ml-12 group">
         <div className="absolute inset-0 bg-red-900/30 mix-blend-color-burn z-10 transition-opacity duration-700 group-hover:opacity-0" />
         {imageUrl ? (
-          <img
+          <Image
             ref={imageRef}
             src={imageUrl}
             alt="Band on stage"
+            fill
             className="w-full h-[125%] object-cover object-top -mt-[12.5%] transition-transform duration-1000 group-hover:scale-105 group-hover:grayscale-0"
           />
         ) : (
@@ -130,10 +132,10 @@ export default function About() {
           <div className="absolute -left-10 top-0 w-1 h-full bg-zinc-900/50" />
 
           <p className="font-roboto-mono text-zinc-400 leading-relaxed max-w-xl text-sm md:text-lg">
-            For over four decades, we've forged a path through blood, sweat, and heavy riffs. From underground thrash scenes to sold-out global arenas, the intensity has never wavered.
+            For over four decades, we&apos;ve forged a path through blood, sweat, and heavy riffs. From underground thrash scenes to sold-out global arenas, the intensity has never wavered.
           </p>
           <p className="font-roboto-mono text-zinc-400 leading-relaxed max-w-xl text-sm md:text-lg">
-            This isn't just music. It's an unrelenting force. An energy shared between the stage and the pit. The legacy continues, louder and faster than ever before.
+            This isn&apos;t just music. It&apos;s an unrelenting force. An energy shared between the stage and the pit. The legacy continues, louder and faster than ever before.
           </p>
 
           <div className="pt-8">
