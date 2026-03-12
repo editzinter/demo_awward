@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+@theme {
+  --font-oswald: var(--font-oswald);
+  --font-roboto-mono: var(--font-roboto-mono);
+}
+
+:root {
+  --background: #000000;
+  --foreground: #ffffff;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-roboto-mono);
+}
+
+h1, h2, h3, h4, h5, h6, .font-oswald {
+  font-family: var(--font-oswald);
+  text-transform: uppercase;
+}
+
+/* Custom Scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #000;
+}
+::-webkit-scrollbar-thumb {
+  background: #27272a; /* zinc-800 */
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #dc2626; /* red-600 */
+}
+
+/* Hide scrollbar on canvas to prevent layout shift */
+canvas {
+  touch-action: none;
+}
+@keyframes fadeOut {
+  from { opacity: 1; pointer-events: auto; }
+  to { opacity: 0; pointer-events: none; display: none; }
+}
+
+html.lenis {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
