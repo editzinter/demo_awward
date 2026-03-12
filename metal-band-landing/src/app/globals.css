@@ -63,3 +63,33 @@ html.lenis {
 .lenis.lenis-scrolling iframe {
   pointer-events: none;
 }
+
+/* Custom Cursor Overrides */
+* {
+  cursor: none !important;
+}
+
+/* Make sure links don't try to show default pointer */
+a, button, [role="button"] {
+  cursor: none !important;
+}
+
+
+/* Custom Utilities for Text Stroke */
+.text-stroke-white {
+  -webkit-text-stroke-color: white;
+}
+.text-stroke-red {
+  -webkit-text-stroke-color: #dc2626;
+}
+.stroke-1 {
+  -webkit-text-stroke-width: 1px;
+}
+.stroke-2 {
+  -webkit-text-stroke-width: 2px;
+}
+
+/* Band Members Text Stroke */
+.text-stroke-zinc-500 {
+  -webkit-text-stroke-color: #71717a;
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { PresentationControls, Environment } from "@react-three/drei";
 import * as THREE from "three";
@@ -12,11 +12,8 @@ if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-// 3D Vinyl Record Component without `useTexture` hook to avoid suspense issues inside PresentationControls when loading async
 function VinylRecord({ textureUrl }: { textureUrl: string | null }) {
   const meshRef = useRef<THREE.Group>(null);
-
-  // Use a state for the loaded texture to safely handle async loading without suspense
   const [texture, setTexture] = useState<THREE.Texture | null>(null);
 
   useEffect(() => {
@@ -31,45 +28,34 @@ function VinylRecord({ textureUrl }: { textureUrl: string | null }) {
 
   useFrame((state, delta) => {
     if (meshRef.current) {
-      // Rotate vinyl slowly over time
-      meshRef.current.rotation.y += delta * 0.8;
-
-      // Add slight floating effect
-      meshRef.current.position.y = Math.sin(state.clock.elapsedTime * 2) * 0.1;
+      meshRef.current.rotation.y += delta * 1.2;
+      meshRef.current.position.y = Math.sin(state.clock.elapsedTime * 1.5) * 0.15;
     }
   });
 
   return (
-    <group ref={meshRef} rotation={[Math.PI / 8, 0, 0]}>
-      {/* Vinyl Disc Body */}
+    <group ref={meshRef} rotation={[Math.PI / 6, 0, 0]}>
       <mesh>
-        <cylinderGeometry args={[2.5, 2.5, 0.05, 64]} />
-        <meshStandardMaterial
-          color="#111"
-          roughness={0.2}
-          metalness={0.8}
-        />
+        <cylinderGeometry args={[2.8, 2.8, 0.05, 64]} />
+        <meshStandardMaterial color="#050505" roughness={0.1} metalness={0.9} />
       </mesh>
 
-      {/* Vinyl Grooves (Subtle Ridges) using multiple rings for detail */}
       <mesh position={[0, 0.026, 0]} rotation={[-Math.PI/2, 0, 0]}>
-        <ringGeometry args={[0.8, 2.4, 64]} />
-        <meshStandardMaterial color="#0a0a0a" roughness={0.4} />
+        <ringGeometry args={[0.9, 2.7, 64]} />
+        <meshStandardMaterial color="#020202" roughness={0.3} />
       </mesh>
 
-      {/* Center Label */}
       <mesh position={[0, 0.03, 0]} rotation={[-Math.PI/2, 0, 0]}>
-        <circleGeometry args={[0.8, 32]} />
+        <circleGeometry args={[0.9, 64]} />
         {texture ? (
            <meshBasicMaterial map={texture} />
         ) : (
-           <meshStandardMaterial color="#dc2626" roughness={0.5} />
+           <meshStandardMaterial color="#991b1b" roughness={0.6} />
         )}
       </mesh>
 
-      {/* Center Hole */}
       <mesh position={[0, 0.035, 0]} rotation={[-Math.PI/2, 0, 0]}>
-        <circleGeometry args={[0.05, 16]} />
+        <circleGeometry args={[0.06, 32]} />
         <meshBasicMaterial color="#000" />
       </mesh>
     </group>
@@ -83,8 +69,7 @@ export default function LatestRelease() {
 
   useEffect(() => {
     async function loadCover() {
-      // Query for abstract dark art / metal album cover style
-      const url = await fetchPexelsImage("dark abstract skull fire", "square");
+      const url = await fetchPexelsImage("dark abstract fire metal", "square");
       setCoverUrl(url);
     }
     loadCover();
@@ -94,16 +79,18 @@ export default function LatestRelease() {
     const ctx = gsap.context(() => {
       if (textRef.current) {
         gsap.fromTo(
-          textRef.current,
-          { opacity: 0, x: -50 },
+          textRef.current.children,
+          { opacity: 0, x: -30, filter: "blur(5px)" },
           {
             opacity: 1,
             x: 0,
-            duration: 1.2,
+            filter: "blur(0px)",
+            duration: 1,
+            stagger: 0.1,
             ease: "power3.out",
             scrollTrigger: {
               trigger: containerRef.current,
-              start: "top 60%",
+              start: "top 65%",
             },
           }
         );
@@ -115,60 +102,67 @@ export default function LatestRelease() {
   return (
     <section
       ref={containerRef}
-      className="relative w-full min-h-[90vh] bg-[#0a0a0a] flex flex-col md:flex-row items-center py-24 px-6 md:px-16 overflow-hidden border-t border-zinc-900"
+      className="relative w-full min-h-screen bg-[#050505] flex flex-col md:flex-row items-center py-24 px-6 md:px-16 overflow-hidden"
     >
-      {/* Text Content */}
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-900 to-transparent opacity-50" />
+
       <div
         ref={textRef}
-        className="relative z-10 w-full md:w-1/2 flex flex-col justify-center mb-16 md:mb-0"
+        className="relative z-10 w-full md:w-5/12 flex flex-col justify-center mb-16 md:mb-0 md:pr-12"
       >
-        <span className="text-red-600 font-roboto-mono tracking-[0.3em] uppercase text-xs md:text-sm mb-6">
-          02 // Latest Release
+        <span className="text-red-600 font-roboto-mono tracking-[0.5em] uppercase text-xs mb-8">
+          [ 02 // Latest Release ]
         </span>
-        <h2 className="font-oswald text-6xl md:text-8xl lg:text-9xl leading-[0.8] uppercase tracking-tighter mb-4 text-white">
+        <h2 className="font-oswald text-7xl md:text-8xl lg:text-[10rem] leading-[0.75] uppercase tracking-tighter mb-6 text-white mix-blend-difference drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">
           72 <br/>
-          <span className="text-zinc-700">Seasons</span>
+          <span className="text-zinc-800 text-stroke-white stroke-1">Seasons</span>
         </h2>
 
-        <div className="h-px w-full max-w-sm bg-zinc-800 my-8" />
+        <div className="h-px w-24 bg-red-800 my-8" />
 
-        <p className="font-roboto-mono text-zinc-400 leading-relaxed max-w-md mb-10 text-sm md:text-base">
+        <p className="font-roboto-mono text-zinc-400 leading-relaxed max-w-sm mb-12 text-sm md:text-base tracking-wide">
           The new album is out now. A searing reflection on the first 18 years of life—the 72 seasons that define who we are. Heavy, unrelenting, and pure venom.
         </p>
 
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <button className="px-8 py-4 bg-red-600 text-white font-oswald text-lg uppercase tracking-widest hover:bg-red-700 transition-colors w-full sm:w-auto text-center">
-            Stream Now
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+          <button className="relative group px-10 py-5 bg-red-700 text-white font-oswald text-xl uppercase tracking-[0.2em] overflow-hidden w-full sm:w-auto text-center">
+            <span className="relative z-10 transition-transform duration-300 group-hover:-translate-y-12">Stream Now</span>
+            <span className="absolute inset-0 flex items-center justify-center bg-white z-10 translate-y-full transition-transform duration-300 group-hover:translate-y-0 text-black">
+              Listen
+            </span>
           </button>
-          <button className="px-8 py-4 bg-transparent border border-zinc-700 text-white font-oswald text-lg uppercase tracking-widest hover:border-white transition-colors w-full sm:w-auto text-center">
-            Buy Vinyl
+          <button className="group px-10 py-5 bg-transparent border border-zinc-700 text-zinc-400 font-oswald text-xl uppercase tracking-[0.2em] hover:text-white hover:border-white transition-all duration-300 w-full sm:w-auto text-center relative overflow-hidden">
+             <span className="relative z-10">Buy Vinyl</span>
+             <div className="absolute inset-0 bg-white/5 translate-y-full transition-transform duration-300 group-hover:translate-y-0" />
           </button>
         </div>
       </div>
 
-      {/* 3D Vinyl Canvas */}
-      <div className="relative z-10 w-full md:w-1/2 h-[50vh] md:h-[80vh] flex justify-center items-center cursor-grab active:cursor-grabbing">
-        <Canvas camera={{ position: [0, 2, 8], fov: 50 }}>
-          <ambientLight intensity={0.5} />
-          <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={2} color="#ffffff" />
-          <pointLight position={[-10, -10, -10]} intensity={1} color="#dc2626" />
+      <div className="relative z-10 w-full md:w-7/12 h-[60vh] md:h-[90vh] flex justify-center items-center cursor-none">
+        <div className="absolute w-[120%] h-[120%] bg-[radial-gradient(circle_at_center,rgba(220,38,38,0.1)_0%,transparent_50%)] pointer-events-none" />
+
+        <Canvas camera={{ position: [0, 2, 9], fov: 45 }}>
+          <ambientLight intensity={0.2} />
+          <spotLight position={[10, 15, 10]} angle={0.2} penumbra={1} intensity={2.5} color="#ffffff" />
+          <pointLight position={[-10, -5, -10]} intensity={1.5} color="#dc2626" />
+          <pointLight position={[0, 0, 5]} intensity={0.5} color="#444" />
 
           <PresentationControls
             global
+            snap={false} // Disable snap for smoother manual rotation
+            rotation={[0, 0.5, 0]}
+            polar={[-Math.PI / 4, Math.PI / 4]}
+            azimuth={[-Infinity, Infinity]} // Allow infinite rotation
 
-            snap
-            rotation={[0, 0.3, 0]}
-            polar={[-Math.PI / 3, Math.PI / 3]}
-            azimuth={[-Math.PI / 1.4, Math.PI / 2]}
           >
             <VinylRecord textureUrl={coverUrl} />
           </PresentationControls>
-          <Environment preset="city" />
+          <Environment preset="night" />
         </Canvas>
 
-        {/* Interaction Hint */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-zinc-600 font-roboto-mono text-[10px] tracking-widest uppercase pointer-events-none">
-          [ Drag to Rotate ]
+        <div className="absolute bottom-10 right-10 flex items-center gap-4 text-zinc-500 font-roboto-mono text-[10px] tracking-[0.3em] uppercase pointer-events-none mix-blend-difference">
+          <div className="w-8 h-px bg-zinc-500" />
+          Drag to Rotate
         </div>
       </div>
     </section>
