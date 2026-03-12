@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+interface PexelsVideoFile {
+  quality: string;
+  link: string;
+}
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const type = searchParams.get('type');
@@ -24,7 +29,7 @@ export async function GET(request: NextRequest) {
         }
       });
       const data = await response.json();
-      const url = data.videos?.[0]?.video_files?.find((file: any) => file.quality === 'hd')?.link || null;
+      const url = data.videos?.[0]?.video_files?.find((file: PexelsVideoFile) => file.quality === 'hd')?.link || null;
       return NextResponse.json({ url });
     } else if (type === 'image') {
       const response = await fetch(`https://api.pexels.com/v1/search?query=${query}&orientation=${orientation}&per_page=1`, {

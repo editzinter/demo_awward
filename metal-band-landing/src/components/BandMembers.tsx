@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { fetchPexelsImage } from "@/lib/pexels";
+import Image from "next/image";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -117,9 +118,10 @@ export default function BandMembers() {
               <div className="absolute inset-0 bg-red-900/40 mix-blend-color-burn z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
               {images[idx] ? (
-                <img
+                <Image
                   src={images[idx]}
                   alt={member.name}
+                  fill
                   className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 group-hover:grayscale-0"
                 />
               ) : (

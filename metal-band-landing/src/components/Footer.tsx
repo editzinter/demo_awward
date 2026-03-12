@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Facebook, Twitter, Instagram, Youtube, Music } from "lucide-react";
 import gsap from "gsap";
 

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body { margin: 0; }
+canvas { display: block; }
+</style>
+</head>
+<body>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+const scene = new THREE.Scene();
+const camera = new THREE.Camera();
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+const geometry = new THREE.PlaneGeometry(2, 2);
+const material = new THREE.ShaderMaterial({
+  uniforms: {
+    uTime: { value: 0 }
+  },
+  vertexShader: `
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `
+    uniform float uTime;
+    varying vec2 vUv;
+
+    // A simple SDF for a sphere
+    float sdSphere(vec3 p, float s) {
+      return length(p) - s;
+    }
+
+    void main() {
+      // Normalize pixel coordinates (from -1 to 1)
+      vec2 uv = vUv * 2.0 - 1.0;
+
+      // Ray origin and direction
+      vec3 ro = vec3(0.0, 0.0, -3.0);
+      vec3 rd = normalize(vec3(uv, 1.0));
+
+      float d0 = 0.0;
+
+      // Raymarching
+      for(int i = 0; i < 80; i++) {
+        vec3 p = ro + rd * d0;
+
+        // Add some noise or distortion based on time
+        float d = sdSphere(p, 1.0 + sin(uTime + p.x * 5.0) * 0.1);
+
+        d0 += d;
+        if(d < 0.001 || d0 > 100.0) break;
+      }
+
+      vec3 col = vec3(0.0);
+      if(d0 < 100.0) {
+        // Simple coloring based on distance
+        col = vec3(1.0, 0.2, 0.2) * (1.0 - d0/5.0);
+      }
+
+      gl_FragColor = vec4(col, 1.0);
+    }
+  `
+});
+
+const mesh = new THREE.Mesh(geometry, material);
+scene.add(mesh);
+
+function animate() {
+  requestAnimationFrame(animate);
+  material.uniforms.uTime.value += 0.05;
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>
