@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Lenis from "@studio-freight/lenis";
+import Lenis from "lenis";
 import Hero from "@/components/Hero";
 import About from "@/components/About";
 import LatestRelease from "@/components/LatestRelease";
