@@ -1,65 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { PresentationControls, Environment } from "@react-three/drei";
-import * as THREE from "three";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { fetchPexelsImage } from "@/lib/pexels";
+import { motion } from "framer-motion";
+import Image from "next/image";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
-}
-
-function VinylRecord({ textureUrl }: { textureUrl: string | null }) {
-  const meshRef = useRef<THREE.Group>(null);
-  const [texture, setTexture] = useState<THREE.Texture | null>(null);
-
-  useEffect(() => {
-    if (textureUrl) {
-      const loader = new THREE.TextureLoader();
-      loader.load(textureUrl, (loadedTexture) => {
-        loadedTexture.colorSpace = THREE.SRGBColorSpace;
-        setTexture(loadedTexture);
-      });
-    }
-  }, [textureUrl]);
-
-  useFrame((state, delta) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.y += delta * 1.2;
-      meshRef.current.position.y = Math.sin(state.clock.elapsedTime * 1.5) * 0.15;
-    }
-  });
-
-  return (
-    <group ref={meshRef} rotation={[Math.PI / 6, 0, 0]}>
-      <mesh>
-        <cylinderGeometry args={[2.8, 2.8, 0.05, 64]} />
-        <meshStandardMaterial color="#050505" roughness={0.1} metalness={0.9} />
-      </mesh>
-
-      <mesh position={[0, 0.026, 0]} rotation={[-Math.PI/2, 0, 0]}>
-        <ringGeometry args={[0.9, 2.7, 64]} />
-        <meshStandardMaterial color="#020202" roughness={0.3} />
-      </mesh>
-
-      <mesh position={[0, 0.03, 0]} rotation={[-Math.PI/2, 0, 0]}>
-        <circleGeometry args={[0.9, 64]} />
-        {texture ? (
-           <meshBasicMaterial map={texture} />
-        ) : (
-           <meshStandardMaterial color="#991b1b" roughness={0.6} />
-        )}
-      </mesh>
-
-      <mesh position={[0, 0.035, 0]} rotation={[-Math.PI/2, 0, 0]}>
-        <circleGeometry args={[0.06, 32]} />
-        <meshBasicMaterial color="#000" />
-      </mesh>
-    </group>
-  );
 }
 
 export default function LatestRelease() {
@@ -138,32 +87,39 @@ export default function LatestRelease() {
         </div>
       </div>
 
-      <div className="relative z-10 w-full md:w-7/12 h-[60vh] md:h-[90vh] flex justify-center items-center cursor-none">
+      <div className="relative z-10 w-full md:w-7/12 h-[60vh] md:h-[90vh] flex justify-center items-center">
         <div className="absolute w-[120%] h-[120%] bg-[radial-gradient(circle_at_center,rgba(220,38,38,0.1)_0%,transparent_50%)] pointer-events-none" />
 
-        <Canvas camera={{ position: [0, 2, 9], fov: 45 }}>
-          <ambientLight intensity={0.2} />
-          <spotLight position={[10, 15, 10]} angle={0.2} penumbra={1} intensity={2.5} color="#ffffff" />
-          <pointLight position={[-10, -5, -10]} intensity={1.5} color="#dc2626" />
-          <pointLight position={[0, 0, 5]} intensity={0.5} color="#444" />
+        <motion.div
+          className="relative w-full max-w-lg aspect-square overflow-hidden bg-zinc-900 shadow-2xl shadow-red-900/20"
+          initial={{ clipPath: "inset(100% 0 0 0)" }}
+          whileInView={{ clipPath: "inset(0 0 0 0)" }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 1.5, ease: [0.76, 0, 0.24, 1] }}
+        >
+          {coverUrl ? (
+            <motion.div
+              initial={{ scale: 1.2 }}
+              whileInView={{ scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1.5, ease: "easeOut" }}
+              className="w-full h-full"
+            >
+              <Image
+                src={coverUrl}
+                alt="72 Seasons Album Cover"
+                fill
+                className="w-full h-full object-cover grayscale contrast-125 hover:grayscale-0 transition-all duration-700"
+              />
+            </motion.div>
+          ) : (
+             <div className="w-full h-full animate-pulse bg-zinc-800" />
+          )}
 
-          <PresentationControls
-            global
-            snap={false} // Disable snap for smoother manual rotation
-            rotation={[0, 0.5, 0]}
-            polar={[-Math.PI / 4, Math.PI / 4]}
-            azimuth={[-Infinity, Infinity]} // Allow infinite rotation
-
-          >
-            <VinylRecord textureUrl={coverUrl} />
-          </PresentationControls>
-          <Environment preset="night" />
-        </Canvas>
-
-        <div className="absolute bottom-10 right-10 flex items-center gap-4 text-zinc-500 font-roboto-mono text-[10px] tracking-[0.3em] uppercase pointer-events-none mix-blend-difference">
-          <div className="w-8 h-px bg-zinc-500" />
-          Drag to Rotate
-        </div>
+          {/* Decorative frame */}
+          <div className="absolute top-4 left-4 w-12 h-12 border-t-2 border-l-2 border-red-600/50 pointer-events-none" />
+          <div className="absolute bottom-4 right-4 w-12 h-12 border-b-2 border-r-2 border-red-600/50 pointer-events-none" />
+        </motion.div>
       </div>
     </section>
   );
