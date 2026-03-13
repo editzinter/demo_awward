@@ -139,7 +139,7 @@ export default function About() {
           </p>
 
           <div className="pt-8">
-            <button className="group relative inline-flex items-center justify-center px-10 py-5 font-roboto-mono font-bold text-white uppercase tracking-[0.3em] overflow-hidden border border-zinc-700 bg-black transition-colors hover:border-red-600 text-sm">
+            <button className="magnetic-wrap group relative inline-flex items-center justify-center px-10 py-5 font-roboto-mono font-bold text-white uppercase tracking-[0.3em] overflow-hidden border border-zinc-700 bg-black transition-colors hover:border-red-600 text-sm">
               <span className="relative z-10 transition-transform duration-500 group-hover:-translate-y-12">Read The Story</span>
               <span className="absolute inset-0 flex items-center justify-center bg-red-600 z-10 translate-y-full transition-transform duration-500 group-hover:translate-y-0 text-black">
                 Enter The Pit

@@ -111,33 +111,33 @@ export default function BandMembers() {
           <div
             key={member.name}
             ref={(el) => { membersRef.current[idx] = el; }}
-            className="group relative flex flex-col items-center"
+            className="magnetic-wrap group relative flex flex-col items-center"
             style={{ marginTop: `${idx % 2 === 0 ? '0' : '80px'}` }}
           >
-            <div className="w-full aspect-[3/4] overflow-hidden relative grayscale contrast-125 mb-8">
-              <div className="absolute inset-0 bg-red-900/40 mix-blend-color-burn z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+            <div className="w-full aspect-[3/4] overflow-hidden relative grayscale contrast-125 mb-8 rounded-lg">
+              <div className="absolute inset-0 bg-red-900/40 mix-blend-color-burn z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
               {images[idx] ? (
-                <Image
+                 <Image
                   src={images[idx]}
                   alt={member.name}
                   fill
-                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 group-hover:grayscale-0"
+                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 group-hover:grayscale-0 pointer-events-none"
                 />
               ) : (
                 <div className="w-full h-full bg-zinc-900 animate-pulse" />
               )}
 
               {/* Image Frame Elements */}
-              <div className="absolute top-0 left-0 w-8 h-8 border-t border-l border-zinc-600 z-20 transition-colors group-hover:border-red-600" />
-              <div className="absolute bottom-0 right-0 w-8 h-8 border-b border-r border-zinc-600 z-20 transition-colors group-hover:border-red-600" />
+              <div className="absolute top-0 left-0 w-8 h-8 border-t border-l border-zinc-600 z-20 transition-colors group-hover:border-red-600 pointer-events-none" />
+              <div className="absolute bottom-0 right-0 w-8 h-8 border-b border-r border-zinc-600 z-20 transition-colors group-hover:border-red-600 pointer-events-none" />
             </div>
 
-            <div className="text-center overflow-hidden">
+            <div className="text-center overflow-hidden w-full h-24 pointer-events-none">
                <h3 className="font-oswald text-4xl md:text-5xl text-zinc-100 uppercase tracking-tight mb-2 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
                  {member.name}
                </h3>
-               <p className="font-roboto-mono text-zinc-500 text-sm tracking-[0.3em] uppercase group-hover:text-red-600 transition-colors duration-500">
+               <p className="font-roboto-mono text-zinc-500 text-sm tracking-[0.3em] uppercase group-hover:text-red-600 transition-colors duration-500 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 delay-100">
                  {member.role}
                </p>
             </div>
