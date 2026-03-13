@@ -2,17 +2,12 @@
 
 export default function NoiseOverlay() {
   return (
-    <div className="pointer-events-none fixed inset-0 z-[9997] h-full w-full opacity-[0.06] mix-blend-screen">
-      <svg
-        viewBox="0 0 200 200"
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-full w-full"
-        preserveAspectRatio="none"
-      >
+    <div className="fixed inset-0 pointer-events-none z-[9997] mix-blend-overlay opacity-30 w-full h-full">
+      <svg className="absolute w-full h-full" xmlns="http://www.w3.org/2000/svg">
         <filter id="noiseFilter">
           <feTurbulence
             type="fractalNoise"
-            baseFrequency="0.65"
+            baseFrequency="0.85"
             numOctaves="3"
             stitchTiles="stitch"
           />
