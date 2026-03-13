@@ -54,7 +54,7 @@ export default function CustomCursor() {
     // Make elements magnetic
     const magneticElements = document.querySelectorAll('.magnetic-wrap');
 
-    magneticElements.forEach(() => {
+    magneticElements.forEach((el) => {
       const magnet = el as HTMLElement;
 
       const onMagnetMove = (e: MouseEvent) => {
