@@ -3,6 +3,7 @@ import { Oswald, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import NoiseOverlay from "../components/NoiseOverlay";
 import CustomCursor from "../components/CustomCursor";
+import SmoothScroller from "../components/SmoothScroller";
 
 const oswald = Oswald({
   subsets: ["latin"],
@@ -30,6 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${oswald.variable} ${robotoMono.variable} cursor-none`}>
       <body className="bg-black text-zinc-100 font-mono antialiased selection:bg-red-700 selection:text-white overflow-x-hidden min-h-screen">
+        <SmoothScroller />
         <CustomCursor />
         <NoiseOverlay />
         {children}
