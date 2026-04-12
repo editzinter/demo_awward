@@ -135,13 +135,17 @@ export default function Footer() {
             className="relative flex flex-col sm:flex-row w-full max-w-md gap-4"
             onSubmit={(e) => e.preventDefault()}
           >
+            <label htmlFor="newsletter-email" className="sr-only">
+              Email Address
+            </label>
             <input
+              id="newsletter-email"
               type="email"
               placeholder="YOUR EMAIL ADDRESS"
-              className="w-full bg-transparent border-b border-zinc-700 py-4 px-2 text-white font-roboto-mono text-sm tracking-widest uppercase focus:outline-none focus:border-red-600 transition-colors placeholder:text-zinc-600"
+              className="w-full bg-transparent border-b border-zinc-700 py-4 px-2 text-white font-roboto-mono text-sm tracking-widest uppercase focus:outline-none focus:border-red-600 focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-sm transition-colors placeholder:text-zinc-600"
               required
             />
-            <MagneticButton className="px-8 py-4 bg-white text-black font-oswald text-lg uppercase tracking-widest hover:bg-red-600 hover:text-white transition-colors duration-300 w-full sm:w-auto text-center cursor-pointer">
+            <MagneticButton className="px-8 py-4 bg-white text-black font-oswald text-lg uppercase tracking-widest hover:bg-red-600 hover:text-white transition-colors duration-300 w-full sm:w-auto text-center cursor-pointer focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-sm">
               Submit
             </MagneticButton>
           </motion.form>
@@ -163,8 +167,10 @@ export default function Footer() {
               { icon: Twitter, label: "Twitter" },
               { icon: Facebook, label: "Facebook" },
             ].map((social, idx) => (
-              <MagneticIcon key={idx} className="border border-zinc-800 rounded-full p-4 cursor-pointer hover:border-red-600 hover:bg-red-600/10 transition-all duration-300 group">
-                <social.icon className="w-6 h-6 text-zinc-400 group-hover:text-red-500 transition-colors pointer-events-none" />
+              <MagneticIcon key={idx} className="border border-zinc-800 rounded-full p-4 hover:border-red-600 hover:bg-red-600/10 transition-all duration-300 group">
+                <a href="#" onClick={(e) => e.preventDefault()} aria-label={social.label} className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 rounded-full block">
+                  <social.icon className="w-6 h-6 text-zinc-400 group-hover:text-red-500 transition-colors pointer-events-none" />
+                </a>
               </MagneticIcon>
             ))}
           </motion.ul>
